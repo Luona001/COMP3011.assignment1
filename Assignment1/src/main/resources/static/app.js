@@ -59,7 +59,8 @@ function stopRecording() {
     statusElement.textContent = "Status: Recording stopped";
 }
 
-function handleRecordingStopped() {
+async function handleRecordingStopped() {
+
     const audioBlob = new Blob(audioChunks, {
         type: mediaRecorder.mimeType
     });
@@ -67,4 +68,74 @@ function handleRecordingStopped() {
     console.log("Audio Blob:", audioBlob);
     console.log("Audio size:", audioBlob.size);
     console.log("Audio type:", audioBlob.type);
+
+    const formData = new FormData();
+
+    formData.append(
+        "audio",
+        audioBlob,
+        "recording.webm"
+    );
+
+    try {
+
+        statusElement.textContent =
+            "Status: Uploading audio...";
+
+        console.log(
+            "Uploading audio to backend..."
+        );
+
+        const response = await fetch(
+            "/api/v1/transcribe",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        console.log(
+            "HTTP status:",
+            response.status
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                `HTTP error: ${response.status}`
+            );
+        }
+
+        const result = await response.text();
+
+        console.log(
+            "Backend response:",
+            result
+        );
+
+        statusElement.textContent =
+            "Status: Audio uploaded successfully";
+
+    } catch (error) {
+
+        console.error(
+            "Failed to upload audio:",
+            error
+        );
+
+        statusElement.textContent =
+            "Status: Upload failed";
+    }
+
+    if (mediaStream) {
+
+        mediaStream.getTracks().forEach(
+            track => track.stop()
+        );
+
+        mediaStream = null;
+    }
+
+    startButton.disabled = false;
+    stopButton.disabled = true;
 }
+

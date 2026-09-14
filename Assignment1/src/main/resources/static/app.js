@@ -105,15 +105,22 @@ async function handleRecordingStopped() {
             );
         }
 
-        const result = await response.text();
+		const result = await response.text();
 
-        console.log(
-            "Backend response:",
-            result
-        );
+		        console.log(
+		            "Backend response:",
+		            result
+		        );
 
-        statusElement.textContent =
-            "Status: Audio uploaded successfully";
+		        try {
+		            const json = JSON.parse(result);
+		            document.getElementById("transcription").textContent = json.text;
+		        } catch (e) {
+		            document.getElementById("transcription").textContent = result;
+		        }
+
+		        statusElement.textContent =
+		            "Status: Transcription complete";
 
     } catch (error) {
 

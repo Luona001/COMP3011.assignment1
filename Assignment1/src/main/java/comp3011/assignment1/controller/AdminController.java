@@ -1,0 +1,66 @@
+package comp3011.assignment1.controller;
+
+import comp3011.assignment1.service.ServerStatsService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.context.ConfigurableApplicationContext;
+import java.time.Instant;
+import java.time.Duration;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/v1/admin")
+public class AdminController {
+
+    private final ServerStatsService statsService;
+    private final ConfigurableApplicationContext applicationContext;
+
+    public AdminController(
+            ServerStatsService statsService,
+            ConfigurableApplicationContext applicationContext) {
+        this.statsService = statsService;
+        this.applicationContext = applicationContext;
+    }
+
+    @GetMapping("/uptime")
+    public ResponseEntity<Map<String, Object>> getUptime() {
+        Instant now = Instant.now();
+        Instant start = statsService.getServerStartTime();
+        double uptimeSeconds = Duration.between(start, now).toMillis() / 1000.0;
+
+        return ResponseEntity.ok(Map.of(
+                "utcServerStart", start.toString(),
+                "utcNow", now.toString(),
+                "serverUptimeSeconds", uptimeSeconds
+        ));
+    }
+
+    @PostMapping("/shutdown")
+    public ResponseEntity<Map<String, Object>> shutdown() {
+        if (!statsService.tryStartShutdown()) {
+            return ResponseEntity.status(409).body(Map.of(
+                    "timestamp", Instant.now().toString(),
+                    "status", 409,
+                    "error", "Conflict",
+                    "message", "Graceful shutdown is already in progress.",
+                    "path", "/api/v1/admin/shutdown"
+            ));
+        }
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            applicationContext.close();
+        }).start();
+
+        return ResponseEntity.accepted().body(Map.of(
+                "message", "Graceful shutdown requested."
+        ));
+    }
+}

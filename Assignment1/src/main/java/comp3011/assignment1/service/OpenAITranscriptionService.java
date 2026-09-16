@@ -1,5 +1,6 @@
 package comp3011.assignment1.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -55,18 +56,10 @@ public class OpenAITranscriptionService {
                 .body(String.class);
 
         try {
-            int usageIdx = response.indexOf("\"usage\"");
-            if (usageIdx > 0) {
-                int promptIdx = response.indexOf("\"prompt_tokens\"", usageIdx);
-                int completionIdx = response.indexOf("\"completion_tokens\"", usageIdx);
-                if (promptIdx > 0 && completionIdx > 0) {
-                    long input = Long.parseLong(
-                        response.substring(promptIdx + 16, response.indexOf(",", promptIdx)).trim());
-                    long output = Long.parseLong(
-                        response.substring(completionIdx + 20, response.indexOf("}", completionIdx)).trim());
-                    statsService.addTokens(input, output);
-                }
-            }
+            var root = new ObjectMapper().readTree(response);
+            long input = root.path("usage").path("input_tokens").asLong(0);
+            long output = root.path("usage").path("output_tokens").asLong(0);
+            statsService.addTokens(input, output);
         } catch (Exception e) {
         }
         return response;

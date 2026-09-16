@@ -1,3 +1,11 @@
+/**
+ * Client-side JavaScript for audio recording and transcription.
+ * 
+ * Uses MediaRecorder API to capture microphone audio as WebM Blob.
+ * On recording stop, uploads audio via FormData to POST /api/v1/transcribe.
+ * Displays the transcribed text or error message to the user.
+ * Manages button states and status text for clear user feedback.
+ */
 const startButton = document.getElementById("startButton");
 const stopButton = document.getElementById("stopButton");
 const statusElement = document.getElementById("status");

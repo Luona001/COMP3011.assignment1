@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * REST controller for audio transcription.
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/v1")
 public class TranscriptionController {
+	private static final Logger log = LoggerFactory.getLogger(TranscriptionController.class);
 	private final OpenAITranscriptionService transcriptionService;
 
     public TranscriptionController(
@@ -35,7 +38,7 @@ public class TranscriptionController {
             String result = transcriptionService.transcribe(audio);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            System.err.println("Transcription failed: " + e.getMessage());
+        	log.error("Transcription failed: {}", e.getMessage());
             return ResponseEntity
                     .internalServerError()
                     .body("Transcription failed: " + e.getMessage());

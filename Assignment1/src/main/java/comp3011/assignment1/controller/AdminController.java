@@ -10,6 +10,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import java.time.Instant;
 import java.time.Duration;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * REST controller for server administration.
@@ -29,6 +31,7 @@ public class AdminController {
 
     private final ServerStatsService statsService;
     private final ConfigurableApplicationContext applicationContext;
+    private static final Logger log = LoggerFactory.getLogger(AdminController.class);
 
     public AdminController(
             ServerStatsService statsService,
@@ -53,6 +56,7 @@ public class AdminController {
     @PostMapping("/shutdown")
     public ResponseEntity<Map<String, Object>> shutdown() {
         if (!statsService.tryStartShutdown()) {
+        	log.info("Shutdown already in progress, returning 409");
             return ResponseEntity.status(409).body(Map.of(
                     "timestamp", Instant.now().toString(),
                     "status", 409,
@@ -62,6 +66,7 @@ public class AdminController {
             ));
         }
 
+        log.info("Graceful shutdown requested");
         new Thread(() -> {
             try {
                 Thread.sleep(1000);

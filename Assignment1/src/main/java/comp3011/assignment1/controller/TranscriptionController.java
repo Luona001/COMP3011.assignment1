@@ -8,6 +8,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * REST controller for audio transcription.
+ * 
+ * Endpoint: POST /api/v1/transcribe
+ * - Accepts multipart/form-data audio file upload (parameter name: "audio")
+ * - Forwards audio to OpenAITranscriptionService for processing
+ * - Returns raw JSON response from OpenAI (includes "text" and "usage" fields)
+ * - Returns HTTP 500 with error message if transcription fails
+ */
 @RestController
 @RequestMapping("/api/v1")
 public class TranscriptionController {

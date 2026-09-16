@@ -7,6 +7,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
+/**
+ * REST controller for global token usage statistics.
+ * 
+ * Endpoint: GET /api/v1/global/stats
+ * - Returns JSON with "inputTokens" and "outputTokens" fields
+ * - Values are cumulative across all transcription calls since server start
+ * - Used by frontend and TITAN testing to verify token tracking accuracy
+ */
 @RestController
 @RequestMapping("/api/v1/global")
 public class GlobalStatsController {

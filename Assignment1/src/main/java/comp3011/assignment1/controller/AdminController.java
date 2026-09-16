@@ -11,6 +11,18 @@ import java.time.Instant;
 import java.time.Duration;
 import java.util.Map;
 
+/**
+ * REST controller for server administration.
+ * 
+ * Endpoints:
+ * - GET /api/v1/admin/uptime
+ *   Returns JSON with "utcServerStart", "utcNow", and "serverUptimeSeconds"
+ * 
+ * - POST /api/v1/admin/shutdown
+ *   Initiates graceful shutdown after 1 second delay.
+ *   Returns 202 Accepted on first call, 409 Conflict if already in progress.
+ *   Uses AtomicBoolean to prevent duplicate shutdown requests.
+ */
 @RestController
 @RequestMapping("/api/v1/admin")
 public class AdminController {

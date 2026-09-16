@@ -13,13 +13,15 @@
 
     <h1>Audio Transcription</h1>
 
-    <button id="startButton">Start Recording</button>
-    <button id="stopButton" disabled>Stop Recording</button>
+    <button id="startButton" aria-label="Start recording audio">Start Recording</button>
+    <button id="stopButton" disabled aria-label="Stop recording audio">Stop Recording</button>
 
     <p id="status">Status: Not recording</p>
 
     <h2>Transcription</h2>
     <p id="transcription"></p>
+	<p id="loading" style="display:none; color:#FF9800; font-weight:bold;">Uploading audio...</p>
+	<p id="error" style="display:none; color:#f44336; font-weight:bold;"></p>
 	
 	<script src="app.js"></script>
 

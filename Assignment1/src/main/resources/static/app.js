@@ -9,6 +9,8 @@
 const startButton = document.getElementById("startButton");
 const stopButton = document.getElementById("stopButton");
 const statusElement = document.getElementById("status");
+const loadingElement = document.getElementById("loading");
+const errorElement = document.getElementById("error");
 
 let mediaRecorder;
 let audioChunks = [];
@@ -41,6 +43,8 @@ async function startRecording() {
         stopButton.disabled = false;
 
         statusElement.textContent = "Status: Recording...";
+		errorElement.style.display = "none";
+		errorElement.textContent = "";
 
     } catch (error) {
         console.error("Could not access microphone:", error);
@@ -89,6 +93,7 @@ async function handleRecordingStopped() {
 
         statusElement.textContent =
             "Status: Uploading audio...";
+			loadingElement.style.display = "block";
 
         console.log(
             "Uploading audio to backend..."
@@ -129,6 +134,7 @@ async function handleRecordingStopped() {
 
 		        statusElement.textContent =
 		            "Status: Transcription complete";
+					loadingElement.style.display = "none";
 
     } catch (error) {
 
@@ -137,8 +143,11 @@ async function handleRecordingStopped() {
             error
         );
 
-        statusElement.textContent =
-            "Status: Upload failed";
+		loadingElement.style.display = "none";
+		        errorElement.textContent = "Error: " + error.message;
+		        errorElement.style.display = "block";
+		        statusElement.textContent =
+		            "Status: Upload failed";
     }
 
     if (mediaStream) {

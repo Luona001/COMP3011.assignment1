@@ -5,6 +5,14 @@ import java.time.Instant;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Thread-safe service for tracking server statistics.
+ * 
+ * Tracks cumulative input/output token usage across all transcription calls.
+ * Uses AtomicLong for concurrent access without explicit locking, which is
+ * essential when virtual threads call addTokens() simultaneously.
+ * Also manages server start time (for uptime calculation) and shutdown state.
+ */
 @Service
 public class ServerStatsService {
 

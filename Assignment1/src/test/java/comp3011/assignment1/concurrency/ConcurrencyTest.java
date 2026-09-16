@@ -4,8 +4,10 @@ import comp3011.assignment1.service.ServerStatsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -18,11 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource(properties = "openai.api.key=test-key")
 class ConcurrencyTest {
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private ServerStatsService statsService;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Test
     void concurrentUptimeRequests_noCrash() throws Exception {
@@ -31,11 +35,12 @@ class ConcurrencyTest {
         CountDownLatch latch = new CountDownLatch(threadCount);
         AtomicInteger successCount = new AtomicInteger(0);
         AtomicInteger failCount = new AtomicInteger(0);
+        String url = "http://localhost:" + port + "/api/v1/admin/uptime";
 
         for (int i = 0; i < threadCount; i++) {
             executor.submit(() -> {
                 try {
-                    var response = restTemplate.getForEntity("/api/v1/admin/uptime", String.class);
+                    ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
                     if (response.getStatusCode().is2xxSuccessful()) {
                         successCount.incrementAndGet();
                     } else {

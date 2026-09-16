@@ -10,6 +10,16 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Service class for OpenAI speech-to-text integration.
+ * 
+ * Calls OpenAI's /v1/audio/transcriptions endpoint using Spring RestClient.
+ * API key is loaded from environment variable OPENAI_API_KEY (never hardcoded).
+ * Token usage (input/output tokens) is parsed from JSON response using Jackson ObjectMapper
+ * and passed to ServerStatsService for cumulative tracking.
+ * 
+ * Uses RestClient instead of OpenAI Java SDK for simplicity and fewer dependencies.
+ */
 @Service
 public class OpenAITranscriptionService {
 
